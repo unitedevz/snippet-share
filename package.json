@@ -1,0 +1,29 @@
+{
+  "name": "snippet-share",
+  "version": "1.0.0",
+  "description": "Self-hosted pastebin/snippet sharing — web UI + CLI, file storage by default with optional Postgres.",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "bin": {
+    "snippet-share": "cli/pastebin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unitedevz/snippet-share.git"
+  },
+  "homepage": "https://github.com/unitedevz/snippet-share",
+  "author": "Boy-Offi9",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node --test tests/store.test.js tests/postgres-store.mock.test.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
