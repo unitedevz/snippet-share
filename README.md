@@ -9,12 +9,17 @@ A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link
 ## Features
 
 - Web UI — paste, set an optional expiry, optionally burn-after-read, get a shareable link
+- Drag & drop a file straight into the paste box — language auto-fills from the file extension
+- Language dropdown with auto-detect (via highlight.js) as the default, or pick one manually
+- Live character/line counter as you type
+- Syntax highlighting on the view page (via highlight.js), matched to the paste's language
+- Dark/light theme toggle, remembered across visits, mobile-friendly layout throughout
 - CLI client — `cat file.txt | node cli/pastebin.js` and get a URL back
 - Raw text endpoint for any paste (`/:id/raw`) — good for `curl`-ing into scripts
 - Expiry options: never, 10 minutes, 1 hour, 1 day, 7 days
 - Burn-after-read — paste is deleted the moment it's viewed once
 - File-based storage by default, one JSON file per paste — no database required to get started
-- XSS-safe rendering (content is HTML-escaped before display)
+- XSS-safe rendering (content is HTML-escaped before display, even with syntax highlighting layered on top)
 
 ## Setup
 

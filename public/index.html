@@ -5,21 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>snippet-share</title>
 <link rel="stylesheet" href="/style.css" />
+<script>
+  // Applied before paint to avoid a flash of the wrong theme.
+  (function () {
+    const saved = localStorage.getItem('theme');
+    const theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
 </head>
 <body>
 <div class="wrap">
   <header>
     <span class="brand">snippet-share</span>
-    <span class="tagline">paste it, share the link, done</span>
+    <div class="header-actions">
+      <span class="tagline">paste it, share the link, done</span>
+      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
+    </div>
   </header>
 
   <form id="pasteForm">
-    <textarea id="content" placeholder="Paste your text or code here…" spellcheck="false" required></textarea>
+    <div class="dropzone" id="dropzone">
+      <textarea id="content" placeholder="Paste your text or code here… (or drag a file in)" spellcheck="false" required></textarea>
+      <p class="dropzone-hint">Drop a file here to load it, or paste directly.</p>
+      <div class="stats">
+        <span id="charCount">0 characters</span>
+        <span id="lineCount">0 lines</span>
+      </div>
+    </div>
 
     <div class="controls">
       <label>
-        Language label
-        <input id="language" type="text" placeholder="text, js, python…" />
+        Language
+        <select id="language">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="text">Plain text</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="python">Python</option>
+          <option value="go">Go</option>
+          <option value="java">Java</option>
+          <option value="kotlin">Kotlin</option>
+          <option value="rust">Rust</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="csharp">C#</option>
+          <option value="php">PHP</option>
+          <option value="ruby">Ruby</option>
+          <option value="bash">Bash / Shell</option>
+          <option value="json">JSON</option>
+          <option value="yaml">YAML</option>
+          <option value="markdown">Markdown</option>
+          <option value="sql">SQL</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+        </select>
       </label>
 
       <label>
@@ -51,6 +91,7 @@
   <p class="cli-hint">Prefer the terminal? <code>cat file.txt | node cli/pastebin.js</code></p>
 </div>
 
-<script src="/app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js" defer></script>
+<script src="/app.js" defer></script>
 </body>
 </html>
