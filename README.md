@@ -3,7 +3,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/unitedevz/snippet-share?style=social)](https://github.com/unitedevz/snippet-share/stargazers) [![Demo](https://img.shields.io/badge/demo-online-brightgreen)](https://snippet-share-pi.vercel.app/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 
-Live demo: https://snippet-share-pi.vercel.app/
+**[Live demo](https://snippet-share-pi.vercel.app/)**
 
 A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link, a CLI to pipe text straight in from the terminal. File-based storage by default, optional Postgres for multi-instance setups.
 
