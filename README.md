@@ -1,10 +1,11 @@
 # snippet-share
 
-![CI](https://github.com/unitedevz/snippet-share/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 
-A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link, a CLI to pipe text straight in from the terminal. File-based storage by default, optional Postgres for multi-instance or persistent deployments.
+Live demo: https://snippet-share-pi.vercel.app/
+
+A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link, a CLI to pipe text straight in from the terminal. File-based storage by default, optional Postgres for multi-instan[...]
 
 ## Features
 
@@ -50,7 +51,7 @@ STORAGE_DRIVER=postgres
 DATABASE_URL=postgres://user:password@host:5432/dbname
 ```
 
-Both backends implement the exact same interface, so nothing else about the app changes — same routes, same CLI, same behavior. Postgres is worth it once you're running more than one instance (e.g. behind a load balancer) or want pastes to survive a container being rebuilt without a volume mount.
+Both backends implement the exact same interface, so nothing else about the app changes — same routes, same CLI, same behavior. Postgres is worth it once you're running more than one instance (e[...]
 
 ### CLI
 
@@ -88,7 +89,7 @@ npm test
 Two layers of coverage:
 - `tests/store.test.js` — file backend against real file I/O in a temp directory
 - `tests/postgres-store.mock.test.js` — postgres backend's query construction and logic against a mocked `pg` client (no live database needed)
-- `tests/postgres-store.integration.test.js` — the same postgres backend against a **real** Postgres. Skipped locally unless `TEST_DATABASE_URL` is set; CI always runs it against a real Postgres service container.
+- `tests/postgres-store.integration.test.js` — the same postgres backend against a **real** Postgres. Skipped locally unless `TEST_DATABASE_URL` is set; CI always runs it against a real Postgres[...]
 
 ## How it works
 
