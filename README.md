@@ -5,7 +5,7 @@
 
 Live demo: https://snippet-share-pi.vercel.app/
 
-A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link, a CLI to pipe text straight in from the terminal. File-based storage by default, optional Postgres for multi-instan[...]
+A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link, a CLI to pipe text straight in from the terminal. File-based storage by default, optional Postgres for multi-instance setups.
 
 ## Features
 
