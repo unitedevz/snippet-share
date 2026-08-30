@@ -36,6 +36,14 @@ npm start
 
 Open `http://localhost:3000`. By default it runs with zero setup — file-based storage, no database needed.
 
+## Deploying to Vercel
+
+Vercel needs two things this repo includes: `vercel.json` (rewrites every request to the serverless function, since paste routes like `/:id` aren't under `/api/`) and `api/index.js` (wraps the Express app as that function).
+
+File storage works there with zero configuration — `DATA_DIR` automatically defaults to `/tmp` when it detects it's running on Vercel (only `/tmp` is writable on their platform; everywhere else is read-only). **The tradeoff: `/tmp` isn't guaranteed to persist.** It survives for the life of a warm container — often several minutes — but a cold start or redeploy can wipe it, so pastes can occasionally disappear unpredictably.
+
+For anything you actually need to persist reliably, set `STORAGE_DRIVER=postgres` and `DATABASE_URL` in your Vercel project's environment variables — that's an upgrade you can make whenever it's convenient, not a requirement just to get the site working.
+
 ## Storage: file (default) or Postgres (optional)
 
 Set `STORAGE_DRIVER` in `.env`:

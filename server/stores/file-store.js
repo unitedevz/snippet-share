@@ -5,10 +5,53 @@ const crypto = require('crypto');
 const { EXPIRY_OPTIONS } = require('../expiry');
 const { hashPassword } = require('../password');
 
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', '..', 'data');
+// Vercel (and most serverless platforms) automatically set VERCEL=1 at
+// runtime. Their filesystem is read-only everywhere except /tmp, so if
+// DATA_DIR wasn't explicitly set, default there instead of the normal
+// repo-relative path — that path is inside the read-only deployment
+// bundle and can never be written to, on any serverless platform.
+//
+// This makes file storage actually work with zero configuration again,
+// matching how it behaves everywhere else. The tradeoff: /tmp is not
+// guaranteed to persist — it survives for the life of a warm container
+// (which can be minutes), but a cold start or redeploy can wipe it. For
+// anything you need to reliably persist, use STORAGE_DRIVER=postgres —
+// but that's now an upgrade you can make when it's convenient, not a
+// requirement just to get something working.
+const DEFAULT_DATA_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'snippet-share-data')
+  : path.join(__dirname, '..', '..', 'data');
 
-if (!fssync.existsSync(DATA_DIR)) {
-  fssync.mkdirSync(DATA_DIR, { recursive: true });
+const DATA_DIR = process.env.DATA_DIR || DEFAULT_DATA_DIR;
+
+let dataDirError = null;
+try {
+  if (!fssync.existsSync(DATA_DIR)) {
+    fssync.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (err) {
+  // Don't throw here — this runs at module load, and throwing would crash
+  // the entire process/serverless function (including static asset
+  // serving) just because storage isn't configured yet. Defer the failure
+  // to the moment something actually tries to read/write a paste, where
+  // the route layer already turns a thrown error into a normal JSON
+  // response instead of a platform-level crash page.
+  //
+  // If DATA_DIR was explicitly overridden to something outside /tmp on a
+  // serverless platform, that's the most likely cause here — the actual
+  // fix is either dropping the override (so it defaults to /tmp) or
+  // switching to STORAGE_DRIVER=postgres + DATABASE_URL for real
+  // persistence.
+  dataDirError = new Error(
+    `Could not create/access DATA_DIR "${DATA_DIR}" (${err.code || err.message}). ` +
+      `On a serverless platform, only /tmp is writable — either remove any custom ` +
+      `DATA_DIR override so it defaults there, or set STORAGE_DRIVER=postgres and ` +
+      `DATABASE_URL for storage that actually persists.`
+  );
+}
+
+function assertDataDirReady() {
+  if (dataDirError) throw dataDirError;
 }
 
 function generateId() {
@@ -21,6 +64,7 @@ function pastePath(id) {
 }
 
 async function createPaste({ content, language, expiresIn, burnAfterRead, password }) {
+  assertDataDirReady();
   if (!content || typeof content !== 'string') {
     throw new Error('content is required');
   }
@@ -67,6 +111,7 @@ async function createPaste({ content, language, expiresIn, burnAfterRead, passwo
 }
 
 async function getPaste(id, { markAsRead = false } = {}) {
+  assertDataDirReady();
   const filePath = pastePath(id);
   if (!filePath || !fssync.existsSync(filePath)) return null;
 
@@ -129,6 +174,7 @@ function safeTokenEqual(a, b) {
  * probe which ids exist.
  */
 async function deletePaste(id, token) {
+  assertDataDirReady();
   const filePath = pastePath(id);
   if (!filePath || !fssync.existsSync(filePath) || !token) return false;
 
@@ -148,6 +194,7 @@ async function deletePaste(id, token) {
 }
 
 async function sweepExpired() {
+  assertDataDirReady();
   const files = await fs.readdir(DATA_DIR).catch(() => []);
   let removed = 0;
   for (const file of files) {

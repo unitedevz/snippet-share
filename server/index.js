@@ -129,12 +129,22 @@ app.get('/:id', handlePasteView);
 // browser history, or server access log this way.
 app.post('/:id', handlePasteView);
 
-const SWEEP_INTERVAL_MS = 10 * 60 * 1000;
-setInterval(() => {
-  sweepExpired().catch((err) => console.error('sweep failed:', err.message));
-}, SWEEP_INTERVAL_MS);
-
 if (require.main === module) {
+  // Only run the standalone server (and its periodic cleanup) when this
+  // file is actually run directly — not when required as a serverless
+  // handler (see api/index.js). A background setInterval doesn't make
+  // sense in a serverless function: the platform freezes/thaws instances
+  // unpredictably, so it wouldn't fire reliably anyway. Expired pastes are
+  // still refused at read time regardless (see getPaste), so skipping the
+  // periodic sweep on serverless just means storage reclamation is
+  // deferred rather than security being affected — set up a Vercel Cron
+  // Job hitting a small cleanup endpoint if you want proactive sweeping
+  // there too.
+  const SWEEP_INTERVAL_MS = 10 * 60 * 1000;
+  setInterval(() => {
+    sweepExpired().catch((err) => console.error('sweep failed:', err.message));
+  }, SWEEP_INTERVAL_MS);
+
   app.listen(PORT, () => console.log(`snippet-share running on http://localhost:${PORT}`));
 }
 
