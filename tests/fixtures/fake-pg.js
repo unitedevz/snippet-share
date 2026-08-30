@@ -23,6 +23,9 @@ class Pool {
       return { rows: nextRows, rowCount: nextRows.length };
     }
     if (sql.trim().startsWith('DELETE')) {
+      if (/RETURNING/i.test(sql)) {
+        return { rows: nextRows, rowCount: nextRows.length };
+      }
       return { rows: [], rowCount: 1 };
     }
     if (sql.trim().startsWith('UPDATE')) {

@@ -92,6 +92,39 @@ function renderPastePage({ id, content, language, createdAt, burnAfterRead }) {
 </html>`;
 }
 
+function renderPasswordPage(id, wasWrong) {
+  const safeId = escapeHtml(id);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Password required · snippet-share</title>
+<link rel="stylesheet" href="/style.css" />
+<script>
+  (function () {
+    const saved = localStorage.getItem('theme');
+    const theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="/" class="brand">snippet-share</a></header>
+  <div class="password-gate">
+    <p>🔒 This paste is password-protected.</p>
+    ${wasWrong ? '<p class="password-error">Incorrect password — try again.</p>' : ''}
+    <form method="POST" action="/${safeId}" class="password-form">
+      <input type="password" name="password" placeholder="Password" autofocus required />
+      <button type="submit">Unlock</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>`;
+}
+
 function renderNotFoundPage() {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -117,4 +150,4 @@ function renderNotFoundPage() {
 </html>`;
 }
 
-module.exports = { escapeHtml, renderPastePage, renderNotFoundPage };
+module.exports = { escapeHtml, renderPastePage, renderNotFoundPage, renderPasswordPage };

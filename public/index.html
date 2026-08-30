@@ -77,6 +77,11 @@
         <input id="burnAfterRead" type="checkbox" />
         Burn after first read
       </label>
+
+      <label>
+        Password (optional)
+        <input id="password" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
+      </label>
     </div>
 
     <button type="submit">Create paste</button>
@@ -86,6 +91,8 @@
     <span>Link ready:</span>
     <a id="resultLink" href="#" target="_blank"></a>
     <button id="copyResult">Copy</button>
+    <button id="deleteResult" class="danger">Delete now</button>
+    <span id="deleteStatus" class="delete-status"></span>
   </div>
 
   <p class="cli-hint">Prefer the terminal? <code>cat file.txt | node cli/pastebin.js</code></p>

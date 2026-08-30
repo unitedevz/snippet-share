@@ -168,6 +168,19 @@ button[type="submit"] {
 .result a { color: var(--accent-green); word-break: break-all; }
 .result.hidden { display: none; }
 
+.result button.danger {
+  background: transparent;
+  color: #f85149;
+  border: 1px solid #f85149;
+}
+
+.result button.danger:hover { background: rgba(248, 81, 73, 0.12); }
+
+.delete-status {
+  font-size: 0.8rem;
+  color: var(--text-muted, #8b949e);
+}
+
 .cli-hint {
   margin-top: 24px;
   color: var(--text-dim);
@@ -192,6 +205,35 @@ button[type="submit"] {
 .notfound {
   color: var(--text-dim);
   margin: 24px 0;
+}
+
+.password-gate {
+  margin: 40px 0;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-raised);
+  max-width: 360px;
+}
+
+.password-error {
+  color: #f85149;
+  font-size: 0.85rem;
+}
+
+.password-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.password-form input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* Theme toggle */

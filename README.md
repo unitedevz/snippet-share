@@ -19,6 +19,8 @@ A self-hosted pastebin/snippet sharing service. Web UI to paste and share a link
 - Raw text endpoint for any paste (`/:id/raw`) — good for `curl`-ing into scripts
 - Expiry options: never, 10 minutes, 1 hour, 1 day, 7 days
 - Burn-after-read — paste is deleted the moment it's viewed once
+- Optional password protection — set a password at creation, viewers need it to read the paste (works with the web UI, the raw endpoint, and the JSON API)
+- Early deletion — every paste gets a one-time delete token at creation, so you can remove it before it naturally expires (via the web UI's "Delete now" button, the CLI, or the API)
 - File-based storage by default, one JSON file per paste — no database required to get started
 - XSS-safe rendering (content is HTML-escaped before display, even with syntax highlighting layered on top)
 
@@ -67,6 +69,20 @@ cat secret.txt | node cli/pastebin.js --expires 1h --burn --lang text
 
 # pointing at a deployed instance instead of localhost
 SERVER_URL=https://paste.yoursite.com node cli/pastebin.js notes.txt
+
+# delete a paste early, using the token printed alongside its URL
+node cli/pastebin.js delete <id> <deleteToken>
+
+# password-protect a paste
+cat secret.txt | node cli/pastebin.js --password hunter2
+```
+
+Every create prints the URL to stdout and the delete command to stderr, so `pastebin file.txt > urls.txt` still captures just the URL — the delete token is right there in your terminal if you want it.
+
+Fetching a password-protected paste programmatically (curl, scripts, etc.) needs the password in an `X-Paste-Password` header — never a query string, since those end up in server access logs and browser history:
+
+```bash
+curl -H "X-Paste-Password: hunter2" https://paste.yoursite.com/<id>/raw
 ```
 
 Link it globally with `npm link` to use it as a plain `pastebin` command.

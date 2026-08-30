@@ -117,6 +117,7 @@ document.getElementById('pasteForm').addEventListener('submit', async (e) => {
   const language = resolveLanguage(content);
   const expiresIn = document.getElementById('expiresIn').value;
   const burnAfterRead = document.getElementById('burnAfterRead').checked;
+  const password = document.getElementById('password').value;
 
   const submitBtn = e.target.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
@@ -126,7 +127,7 @@ document.getElementById('pasteForm').addEventListener('submit', async (e) => {
     const res = await fetch('/api/pastes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, language, expiresIn, burnAfterRead }),
+      body: JSON.stringify({ content, language, expiresIn, burnAfterRead, password: password || undefined }),
     });
 
     const data = await res.json();
@@ -137,11 +138,61 @@ document.getElementById('pasteForm').addEventListener('submit', async (e) => {
     link.href = data.url;
     link.textContent = data.url;
     resultBox.classList.remove('hidden');
+    document.getElementById('password').value = '';
+
+    // Held only in memory for this page load — it's a one-time secret
+    // returned by the server exactly once, at creation. Refreshing the
+    // page or leaving it loses it (same as the server: it's never
+    // re-exposed after creation), so there's nothing extra to clean up.
+    currentDeleteToken = data.deleteToken;
+    currentPasteId = data.id;
+    const deleteBtn = document.getElementById('deleteResult');
+    const deleteStatus = document.getElementById('deleteStatus');
+    deleteBtn.disabled = false;
+    deleteBtn.textContent = 'Delete now';
+    deleteStatus.textContent = '';
   } catch (err) {
     alert(err.message);
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Create paste';
+  }
+});
+
+let currentDeleteToken = null;
+let currentPasteId = null;
+
+document.getElementById('deleteResult').addEventListener('click', async () => {
+  if (!currentDeleteToken || !currentPasteId) return;
+
+  const deleteBtn = document.getElementById('deleteResult');
+  const deleteStatus = document.getElementById('deleteStatus');
+
+  if (!confirm('Delete this paste now? This can\'t be undone.')) return;
+
+  deleteBtn.disabled = true;
+  deleteBtn.textContent = 'Deleting…';
+
+  try {
+    const res = await fetch(`/api/pastes/${currentPasteId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deleteToken: currentDeleteToken }),
+    });
+
+    if (res.status !== 204) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Could not delete this paste');
+    }
+
+    deleteStatus.textContent = 'Deleted.';
+    deleteBtn.remove();
+    currentDeleteToken = null;
+    currentPasteId = null;
+  } catch (err) {
+    deleteStatus.textContent = err.message;
+    deleteBtn.disabled = false;
+    deleteBtn.textContent = 'Delete now';
   }
 });
 
